@@ -30,7 +30,9 @@ async function run() {
         const toysCollection = client.db('toys').collection('toysCollection');
 
         app.get('/toys', async (req,res) =>{
+            console.log(req.params.text)
             const cursor = toysCollection.find();
+          
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -42,13 +44,34 @@ const result = await toysCollection.findOne(query);
             res.send(result);
         })
 
-        app.post('/postToys', async (req,res) =>{
-            const body = req.body;
-          
-            const result = await toysCollection.insertOne(body);
-            res.send(result)
-            console.log(result)
+ app.get('/toys/:email', async (req,res) =>{
+    console.log(req.params.email);
+            // const id = req.params.id;
+// const query = {_id: new ObjectId(id)}
+// const result = await toysCollection.findOne(query);
+//             res.send(result);
+        });
+
+//     
+app.get('/addToys', async(req,res) =>{
+    console.log(req.query.sellerEmail);
+    let query ={};
+    if (req.query?.sellerEmail){
+        query = { sellerEmail: req.query.sellerEmail }
+    }
+    const result = await toysCollection.find(query).toArray();
+    res.send(result);
+})git 
+
+
+        app.post('/addToys', async (req,res) =>{
+            const adding = req.body;
+            console.log(adding);
+            const result = await toysCollection.insertOne(adding);
+           res.send(result);
         })
+
+        
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
