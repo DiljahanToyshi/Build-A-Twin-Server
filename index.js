@@ -62,6 +62,32 @@ const query = {_id: new ObjectId(id)}
 const result = await toysCollection.findOne(query);
             res.send(result);
         })
+        app.get('/update/:id', async (req,res) =>{
+            const id = req.params.id;
+const query = {_id: new ObjectId(id)}
+const result = await toysCollection.findOne(query);
+            res.send(result);
+        });
+
+
+        app.put('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const body = req.body;
+const options ={upsert:true};
+            const filter = { _id: new ObjectId(id) };
+            const updateToy = {
+                $set: {
+                    availableQuantity: body.availableQuantity,
+                    description: body.description,
+                    price: body.price,
+                    subCategory: body.subCategory,
+                    toyName: body.toyName,
+                    picture: body.picture,
+                },
+            };
+            const result = await toysCollection.updateOne(filter, updateToy,options);
+            res.send(result);
+        })
 
  app.get('/toys/:email', async (req,res) =>{
     console.log(req.params.email);
