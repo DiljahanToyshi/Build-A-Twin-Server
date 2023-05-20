@@ -29,6 +29,25 @@ async function run() {
 
         const toysCollection = client.db('toys').collection('toysCollection');
 
+        const indexKeys = { toyName: 1, subCategory:1 };
+        const indexOptions = {name: "NameCategory"};
+
+        const result = await toysCollection.createIndex(indexKeys,indexOptions);
+
+        app.get("/getToysByText/:text", async (req, res) => {
+            const searchText = req.params.text;
+            const result = await toysCollection
+                .find({
+                    $or: [
+                        { toyName: { $regex: searchText, $options: "i" } },
+                        { subCategory: { $regex: searchText, $options: "i" } },
+                    ],
+                })
+                .toArray();
+            res.send(result);
+        });
+
+
         app.get('/toys', async (req,res) =>{
             console.log(req.params.text)
             const cursor = toysCollection.find();
@@ -61,7 +80,7 @@ app.get('/addToys', async(req,res) =>{
     }
     const result = await toysCollection.find(query).toArray();
     res.send(result);
-})git 
+})
 
 
         app.post('/addToys', async (req,res) =>{
@@ -71,6 +90,14 @@ app.get('/addToys', async(req,res) =>{
            res.send(result);
         })
 
+
+        app.delete('/remove/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await toysCollection.deleteOne(query);
+            res.send(result);
+            console.log(result);
+        })
         
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
